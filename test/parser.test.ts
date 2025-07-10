@@ -175,7 +175,7 @@ describe('match_uri', () => {
 		expect(result).toEqual({ name: 'too' });
 	});
 
-	it.skip('should handle consecutive variables', () => {
+	it('should handle consecutive variables', () => {
 		const parsed = parse_template('api/{version}{format}');
 		const result = match_uri('api/v1json', parsed);
 

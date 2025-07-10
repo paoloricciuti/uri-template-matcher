@@ -164,7 +164,7 @@ describe('UriTemplateMatcher', () => {
 			});
 		});
 
-		it.skip('should handle templates with consecutive variables', () => {
+		it('should handle templates with consecutive variables', () => {
 			matcher.add('api/{version}{format}');
 			const result = matcher.match('api/v1json');
 

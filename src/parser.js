@@ -450,7 +450,11 @@ function handle_simple_match(segment, expression, params, uri, uri_index) {
 		}
 
 		// Simple variables should not be empty when at the end of a URI (trailing slash scenario)
-		if (value === '' && uri_index + segment.length === uri.length) {
+		if (
+			value === '' &&
+			uri_index + segment.length === uri.length &&
+			uri.endsWith('/')
+		) {
 			return false;
 		}
 
