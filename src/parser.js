@@ -315,6 +315,8 @@ function find_expression_boundaries(uri, start_index, next_part) {
 					boundaries.push(i);
 				}
 			}
+			// Also consider the end of the URI as a boundary for optional dot notation
+			boundaries.push(uri.length);
 		} else if (next_expr.operator === '/') {
 			// Look for slashes as potential boundaries
 			for (let i = start_index; i < uri.length; i++) {

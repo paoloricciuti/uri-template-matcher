@@ -175,7 +175,7 @@ describe('RFC 6570 Compliance Tests', () => {
 			});
 		});
 
-		it.skip('should handle REST API with optional extensions', () => {
+		it('should handle REST API with optional extensions', () => {
 			matcher.add('/api/v1/users/{id}{.format}');
 
 			const result1 = matcher.match('/api/v1/users/123.json');
