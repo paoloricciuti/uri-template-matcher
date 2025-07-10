@@ -1,6 +1,6 @@
 # URI Template Matcher
 
-A lightweight URI template matcher based on RFC 6570 that allows you to register URI templates and match URIs against them to extract parameters.
+A lightweight URI template library based on RFC 6570 that supports both matching URIs against templates to extract parameters and expanding templates with variables to generate URIs.
 
 ## Installation
 
@@ -231,6 +231,138 @@ console.log(match);
 // }
 ```
 
+## URI Template Expansion
+
+In addition to matching URIs against templates, this library also supports expanding URI templates with variables according to RFC 6570.
+
+### Basic Expansion
+
+```javascript
+import { UriTemplateExpander } from 'uri-template-matcher';
+
+const expander = new UriTemplateExpander('/users/{id}');
+const uri = expander.expand({ id: '123' });
+console.log(uri);
+// Output: '/users/123'
+```
+
+### Expansion with Multiple Variables
+
+```javascript
+const expander = new UriTemplateExpander('/posts/{postId}/comments/{commentId}');
+const uri = expander.expand({ postId: '456', commentId: '789' });
+console.log(uri);
+// Output: '/posts/456/comments/789'
+```
+
+### Reserved String Expansion
+
+```javascript
+const expander = new UriTemplateExpander('/files/{+path}');
+const uri = expander.expand({ path: 'docs/readme.txt' });
+console.log(uri);
+// Output: '/files/docs/readme.txt'
+```
+
+### Fragment Expansion
+
+```javascript
+const expander = new UriTemplateExpander('/page#{section}');
+const uri = expander.expand({ section: 'introduction' });
+console.log(uri);
+// Output: '/page#introduction'
+```
+
+### Query Parameter Expansion
+
+```javascript
+// Single query parameter
+const expander1 = new UriTemplateExpander('/search{?q}');
+console.log(expander1.expand({ q: 'test' }));
+// Output: '/search?q=test'
+
+// Multiple query parameters
+const expander2 = new UriTemplateExpander('/search{?q,limit}');
+console.log(expander2.expand({ q: 'test', limit: '10' }));
+// Output: '/search?q=test&limit=10'
+
+// Query continuation
+const expander3 = new UriTemplateExpander('/search?type=user{&q}');
+console.log(expander3.expand({ q: 'john' }));
+// Output: '/search?type=user&q=john'
+```
+
+### Path and Dot Expansion
+
+```javascript
+// Dot notation
+const expander1 = new UriTemplateExpander('/files{.format}');
+console.log(expander1.expand({ format: 'json' }));
+// Output: '/files.json'
+
+// Path segments
+const expander2 = new UriTemplateExpander('/api{/version}/users');
+console.log(expander2.expand({ version: 'v1' }));
+// Output: '/api/v1/users'
+```
+
+### Value Modifiers
+
+```javascript
+// Prefix modifiers
+const expander1 = new UriTemplateExpander('/api/{name:3}');
+console.log(expander1.expand({ name: 'toolong' }));
+// Output: '/api/too'
+
+// Explode modifiers with arrays
+const expander2 = new UriTemplateExpander('/tags{.tags*}');
+console.log(expander2.expand({ tags: ['red', 'green', 'blue'] }));
+// Output: '/tags.red.green.blue'
+
+// Explode modifiers with objects
+const expander3 = new UriTemplateExpander('/search{?filters*}');
+console.log(expander3.expand({ filters: { color: 'red', size: 'large' } }));
+// Output: '/search?color=red&size=large'
+```
+
+### Working with Complex Variables
+
+```javascript
+const expander = new UriTemplateExpander('/search{?q,filters*}');
+const uri = expander.expand({
+  q: 'uri templates',
+  filters: {
+    category: 'technology',
+    lang: 'en'
+  }
+});
+console.log(uri);
+// Output: '/search?q=uri%20templates&category=technology&lang=en'
+```
+
+### Undefined Variables
+
+Variables that are undefined, null, or empty arrays/objects are ignored:
+
+```javascript
+const expander = new UriTemplateExpander('/search{?q,limit,offset}');
+const uri = expander.expand({ q: 'test' }); // limit and offset are undefined
+console.log(uri);
+// Output: '/search?q=test'
+```
+
+### Using the Expand Function Directly
+
+You can also use the expand function directly without creating an instance:
+
+```javascript
+import { expand_template } from 'uri-template-matcher';
+
+const uri = expand_template('/users/{id}', { id: '123' });
+console.log(uri);
+// Output: '/users/123'
+```
+
 ## API Reference
 
 ### Class: UriTemplateMatcher
@@ -268,6 +400,40 @@ Clears all registered templates.
 
 Returns an array of all registered template strings.
 
+### Class: UriTemplateExpander
+
+#### Constructor
+
+```javascript
+new UriTemplateExpander(template: string)
+```
+
+Creates a new UriTemplateExpander instance.
+
+- `template` - The URI template string to use for expansion
+- Throws `Error` if template is invalid
+
+#### Methods
+
+##### `expand(variables: Record<string, any>): string`
+
+Expands the template with the given variables.
+
+- `variables` - Object containing variable names and values
+- Returns the expanded URI string
+- Throws `Error` if expansion fails
+
+### Functions
+
+##### `expand_template(template: string, variables: Record<string, any>): string`
+
+Expands a URI template with given variables.
+
+- `template` - The URI template string to expand
+- `variables` - Object containing variable names and values
+- Returns the expanded URI string
+- Throws `Error` if template is invalid or expansion fails
+
 ### Types
 
 #### MatchResult
@@ -281,7 +447,7 @@ interface MatchResult {
 
 ## RFC 6570 Compliance
 
-This library implements URI Template matching based on RFC 6570 with support for:
+This library implements URI Template matching and expansion based on RFC 6570 with support for:
 
 - **Level 1**: Simple string expansion
 - **Level 2**: Reserved string expansion (`+`) and fragment expansion (`#`)

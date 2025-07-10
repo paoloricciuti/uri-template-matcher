@@ -3,6 +3,7 @@
  */
 
 export { UriTemplateMatcher } from './matcher.js';
+export { UriTemplateExpander } from './expander.js';
 
 /**
  * @typedef {import('./types.js').MatchResult} MatchResult
