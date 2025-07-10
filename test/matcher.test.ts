@@ -140,7 +140,7 @@ describe('UriTemplateMatcher', () => {
 		});
 	});
 
-	describe('get_templates method', () => {
+	describe('all method', () => {
 		it('should return empty array initially', () => {
 			expect(matcher.all()).toEqual([]);
 		});
