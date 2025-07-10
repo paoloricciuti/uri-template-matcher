@@ -17,6 +17,7 @@
 	"scripts": {
 		"test": "vitest",
 		"test:coverage": "vitest --coverage",
+		"check": "pnpm typecheck && pnpm lint && pnpm format:check && npx publint",
 		"typecheck": "tsc --noEmit",
 		"lint": "eslint src test",
 		"lint:fix": "eslint src test --fix",
