@@ -360,13 +360,7 @@ function match_simple_expression(segment, expression, params, uri, uri_index) {
 		case '+':
 			return handle_reserved_match(segment, expression, params);
 		case '#':
-			return handle_simple_match(
-				segment,
-				expression,
-				params,
-				uri,
-				uri_index,
-			);
+			return handle_fragment_match(segment, expression, params);
 		case '.':
 			return handle_dot_match(segment, expression, params);
 		case '/':
@@ -384,6 +378,56 @@ function match_simple_expression(segment, expression, params, uri, uri_index) {
 				uri,
 				uri_index,
 			);
+	}
+}
+
+/**
+ * Handle fragment match (# operator)
+ * @param {string} segment - URI segment
+ * @param {TemplatePart} expression - Expression part
+ * @param {Record<string, string | string[]>} params - Parameters object
+ * @returns {boolean} Whether the match was successful
+ */
+function handle_fragment_match(segment, expression, params) {
+	if (expression.type !== 'expression') {
+		return false;
+	}
+
+	// Fragment expansion starts with #, so strip it
+	if (!segment.startsWith('#')) {
+		// If no fragment, all variables are undefined
+		for (const expr of expression.expressions) {
+			params[expr.name] = '';
+		}
+		return segment === '';
+	}
+
+	const fragment_content = segment.slice(1);
+
+	if (expression.expressions.length === 1) {
+		const expr = expression.expressions[0];
+		let value = fragment_content;
+
+		if (expr.prefix && value.length > expr.prefix) {
+			value = value.slice(0, expr.prefix);
+		}
+
+		params[expr.name] = decodeURIComponent(value);
+		return true;
+	} else {
+		// Handle multiple variables in a single fragment expression
+		const values = fragment_content.split(',');
+		for (let i = 0; i < expression.expressions.length; i++) {
+			const expr = expression.expressions[i];
+			let value = values[i] || '';
+
+			if (expr.prefix && value.length > expr.prefix) {
+				value = value.slice(0, expr.prefix);
+			}
+
+			params[expr.name] = decodeURIComponent(value);
+		}
+		return true;
 	}
 }
 
@@ -502,12 +546,11 @@ function handle_dot_match(segment, expression, params) {
 
 	// Handle empty segment for optional dot notation
 	if (segment === '') {
-		if (expression.expressions.length === 1) {
-			const expr = expression.expressions[0];
+		// Empty dot segment means all variables are undefined/empty
+		for (const expr of expression.expressions) {
 			params[expr.name] = '';
-			return true;
 		}
-		return false;
+		return true;
 	}
 
 	const clean_segment = segment.startsWith('.') ? segment.slice(1) : segment;
@@ -523,9 +566,21 @@ function handle_dot_match(segment, expression, params) {
 			params[expr.name] = decodeURIComponent(clean_segment);
 		}
 		return true;
-	}
+	} else {
+		// Handle multiple variables in a single dot expression
+		const values = clean_segment.split('.');
+		for (let i = 0; i < expression.expressions.length; i++) {
+			const expr = expression.expressions[i];
+			let value = values[i] || '';
 
-	return false;
+			if (expr.prefix && value.length > expr.prefix) {
+				value = value.slice(0, expr.prefix);
+			}
+
+			params[expr.name] = decodeURIComponent(value);
+		}
+		return true;
+	}
 }
 
 /**
@@ -546,9 +601,22 @@ function handle_path_match(segment, expression, params) {
 		const expr = expression.expressions[0];
 		params[expr.name] = decodeURIComponent(clean_segment);
 		return true;
-	}
+	} else {
+		// Handle multiple variables in a single path expression
+		// For path expressions with multiple variables, they're comma-separated
+		const values = clean_segment.split(',');
+		for (let i = 0; i < expression.expressions.length; i++) {
+			const expr = expression.expressions[i];
+			let value = values[i] || '';
 
-	return false;
+			if (expr.prefix && value.length > expr.prefix) {
+				value = value.slice(0, expr.prefix);
+			}
+
+			params[expr.name] = decodeURIComponent(value);
+		}
+		return true;
+	}
 }
 
 /**
