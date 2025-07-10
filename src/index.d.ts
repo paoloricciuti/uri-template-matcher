@@ -96,3 +96,21 @@ export declare class UriTemplateMatcher {
 	 */
 	all(): string[];
 }
+
+/**
+ * URI Template Expander class
+ */
+export class UriTemplateExpander {
+	/**
+	 * Create a new UriTemplateExpander instance
+	 * @param {string} template - The URI template string
+	 */
+	constructor(template: string);
+
+	/**
+	 * Expand the template with given variables
+	 * @param {Record<string, unknown>} variables - Variables to substitute
+	 * @returns {string} Expanded URI
+	 */
+	expand(variables: Record<string, unknown>): string;
+}
