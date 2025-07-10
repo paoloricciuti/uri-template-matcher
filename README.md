@@ -290,4 +290,4 @@ This library implements URI Template matching based on RFC 6570 with support for
 
 ## License
 
-ISC
+MIT
