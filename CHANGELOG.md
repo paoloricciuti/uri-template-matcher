@@ -1,5 +1,11 @@
 # uri-template-matcher
 
+## 1.1.1
+
+### Patch Changes
+
+- 6901859: fix: move change sets to dev dep
+
 ## 1.1.0
 
 ### Minor Changes
