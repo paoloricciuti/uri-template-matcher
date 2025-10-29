@@ -1,5 +1,11 @@
 # uri-template-matcher
 
+## 1.1.2
+
+### Patch Changes
+
+- 486e8fc: chore: add repository information and default export to package.json
+
 ## 1.1.1
 
 ### Patch Changes
