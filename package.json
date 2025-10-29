@@ -2,6 +2,10 @@
 	"name": "uri-template-matcher",
 	"version": "1.1.1",
 	"description": "A lightweight URI template matcher based on RFC 6570",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/paoloricciuti/uri-template-matcher.git"
+	},
 	"type": "module",
 	"main": "./src/index.js",
 	"types": "./src/index.d.ts",
